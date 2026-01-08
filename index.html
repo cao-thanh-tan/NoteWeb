@@ -3,222 +3,177 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Cloud Note - Cao Thành Tân</title>
-<link rel="icon" href="avatar.jpg" type="image/jpeg">
+    <title>Cloud Note & Maps - Cao Thành Tân</title>
+    <link rel="icon" href="avatar.jpg" type="image/jpeg">
     <style>
-        /* Cấu hình màu sắc */
         :root {
-            --bg: #f0f2f5;
-            --card: #ffffff;
-            --text: #1c1e21;
-            --accent: #007bff;
-            --note-bg: #fff9c4;
+            --bg: #f0f2f5; --card: #ffffff; --text: #1c1e21;
+            --accent: #007bff; --note-bg: #fff9c4; --shadow: rgba(0,0,0,0.1);
         }
-
+        /* Chế độ tối chuyên nghiệp */
         .dark-mode {
-            --bg: #18191a;
-            --card: #242526;
-            --text: #e4e6eb;
-            --accent: #2e89ff;
-            --note-bg: #3a3b3c;
+            --bg: #18191a; --card: #242526; --text: #e4e6eb;
+            --accent: #2e89ff; --note-bg: #3a3b3c; --shadow: rgba(0,0,0,0.3);
         }
 
         body {
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            background-color: var(--bg);
-            color: var(--text);
+            background-color: var(--bg); color: var(--text);
+            margin: 0; padding: 20px; transition: 0.3s;
+        }
+
+        /* BỐ CỤC 2 CỘT */
+        .main-layout {
             display: flex;
-            flex-direction: column;
-            align-items: center;
-            min-height: 100vh;
-            margin: 0;
-            padding: 20px;
-            transition: 0.3s;
+            flex-direction: row;
+            gap: 20px;
+            max-width: 1600px;
+            margin: 0 auto;
+            height: 92vh;
         }
 
-        /* Nút Chế độ tối */
-        .theme-toggle {
-            align-self: flex-end;
-            padding: 8px 16px;
-            border-radius: 20px;
-            border: 1px solid var(--accent);
-            background: transparent;
-            color: var(--text);
-            cursor: pointer;
-            margin-bottom: 20px;
+        /* BẢN ĐỒ BÊN TRÁI (Nhỏ lại: flex 0.8) */
+        #map {
+            flex: 0.8; 
+            border-radius: 15px;
+            border: 2px solid var(--accent);
+            box-shadow: 0 4px 15px var(--shadow);
         }
 
+        /* GHI CHÚ BÊN PHẢI (To ra: flex 1.2) */
         .container {
+            flex: 1.2;
             background: var(--card);
-            width: 100%;
-            max-width: 400px;
             padding: 30px;
             border-radius: 15px;
-            box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+            box-shadow: 0 4px 15px var(--shadow);
             text-align: center;
+            overflow-y: auto;
         }
 
-        .avatar {
-            width: 100px;
-            height: 100px;
-            border-radius: 50%;
-            border: 4px solid var(--accent);
-            object-fit: cover;
-            margin-bottom: 15px;
+        .avatar { width: 90px; height: 90px; border-radius: 50%; border: 3px solid var(--accent); object-fit: cover; margin-bottom: 15px; }
+        h1 { font-size: 22px; margin: 0; text-transform: uppercase; }
+        .mssv { color: var(--accent); font-weight: bold; margin-bottom: 20px; font-size: 14px; }
+
+        .input-group { display: flex; gap: 10px; margin-bottom: 25px; }
+        input { flex: 1; padding: 12px; border-radius: 8px; border: 1px solid #444; background: var(--card); color: var(--text); outline: none; }
+        button#addBtn { padding: 10px 20px; background: #28a745; color: white; border: none; border-radius: 8px; font-weight: bold; cursor: pointer; }
+        
+        ul { list-style: none; padding: 0; text-align: left; }
+        li { 
+            background: var(--note-bg); color: #333; padding: 15px; 
+            margin-bottom: 12px; border-radius: 8px; display: flex; 
+            justify-content: space-between; align-items: center;
+            border-left: 6px solid #f1c40f; font-weight: 500;
         }
+        .del-btn { background: #ff4757; color: white; border: none; padding: 6px 12px; border-radius: 5px; cursor: pointer; font-size: 12px; }
 
-        h1 { margin: 0; font-size: 24px; }
-        .mssv { color: var(--accent); font-weight: bold; margin-bottom: 20px; }
-
-        .input-group {
-            display: flex;
-            gap: 10px;
-            margin-bottom: 25px;
-        }
-
-        input {
-            flex: 1;
-            padding: 12px;
-            border: 1px solid #ddd;
-            border-radius: 8px;
-            outline: none;
-            background: var(--card);
-            color: var(--text);
-        }
-
-        button#addBtn {
-            padding: 10px 20px;
-            background: #28a745;
-            color: white;
-            border: none;
-            border-radius: 8px;
-            font-weight: bold;
-            cursor: pointer;
-        }
-
-        ul { list-style: none; padding: 0; width: 100%; }
-        li {
-            background: var(--note-bg);
-            color: var(--text);
-            padding: 12px 15px;
-            margin-bottom: 10px;
-            border-radius: 8px;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            border-left: 5px solid #f1c40f;
-            text-align: left;
-            animation: slideIn 0.3s ease;
-        }
-
-        .del-btn {
-            background: #ff4757;
-            color: white;
-            border: none;
-            padding: 5px 10px;
-            border-radius: 5px;
-            cursor: pointer;
-            font-size: 12px;
-        }
-
-        @keyframes slideIn {
-            from { opacity: 0; transform: translateX(-10px); }
-            to { opacity: 1; transform: translateX(0); }
+        /* Responsive cho điện thoại khi đi ship hàng */
+        @media (max-width: 1000px) {
+            .main-layout { flex-direction: column; height: auto; }
+            #map { height: 350px; width: 100%; }
+            .container { max-width: 100%; width: 100%; box-sizing: border-box; }
         }
     </style>
 </head>
-<body>
+<body class="dark-mode">
 
-    <button class="theme-toggle" onclick="toggleTheme()" id="themeBtn">Chế độ tối: Tắt</button>
+    <div class="main-layout">
+        <div id="map"></div>
 
-    <div class="container">
-        <img src="avatar.jpg" alt="Avatar" class="avatar">
-        <h1>CAO THÀNH TÂN</h1>
-        <div class="mssv">MSSV: 29211345079</div>
+        <div class="container">
+            <img src="avatar.jpg" alt="Avatar" class="avatar">
+            <h1>CAO THÀNH TÂN</h1>
+            <div class="mssv">MSSV: 29211345079</div>
 
-        <div class="input-group">
-            <input type="text" id="noteInput" placeholder="Nhập ghi chú vào đám mây...">
-            <button id="addBtn" onclick="addNote()">Thêm</button>
+            <div class="input-group">
+                <input type="text" id="noteInput" placeholder="Nhập ghi chú:...">
+                <button id="addBtn" onclick="addNote()">Thêm</button>
+            </div>
+            <ul id="noteList"></ul>
         </div>
-
-        <ul id="noteList">
-            </ul>
     </div>
 
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
         import { getFirestore, collection, addDoc, onSnapshot, deleteDoc, doc, query, orderBy, serverTimestamp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
 
-        // --- BƯỚC QUAN TRỌNG: TÂN THAY ĐOẠN DƯỚI BẰNG CONFIG CỦA BẠN ---
-       const firebaseConfig = {
-  apiKey: "AIzaSyDmqg2985OqlWyyusRhwYuRv6CtVVYjl_0",
-  authDomain: "notewebctt.firebaseapp.com",
-  projectId: "notewebctt",
-  storageBucket: "notewebctt.firebasestorage.app",
-  messagingSenderId: "121584329654",
-  appId: "1:121584329654:web:3d41d1b2b89dbac4175717",
-  measurementId: "G-00PYX7NE0X"
-};
-        // -------------------------------------------------------------
+        const firebaseConfig = {
+            apiKey: "AIzaSyDmqg2985OqlWyyusRhwYuRv6CtVVYjl_0",
+            authDomain: "notewebctt.firebaseapp.com",
+            projectId: "notewebctt",
+            storageBucket: "notewebctt.firebasestorage.app",
+            messagingSenderId: "121584329654",
+            appId: "1:121584329654:web:3d41d1b2b89dbac4175717",
+            measurementId: "G-00PYX7NE0X"
+        };
 
         const app = initializeApp(firebaseConfig);
         const db = getFirestore(app);
         const notesCol = collection(db, "notes_cua_tan");
 
-        // Tự động tải dữ liệu khi có thay đổi (Real-time)
         onSnapshot(query(notesCol, orderBy("createdAt", "desc")), (snapshot) => {
-            const noteList = document.getElementById('noteList');
-            noteList.innerHTML = "";
+            const list = document.getElementById('noteList');
+            list.innerHTML = "";
             snapshot.forEach((doc) => {
                 const note = doc.data();
                 const li = document.createElement('li');
-                li.innerHTML = `
-                    <span>${note.text}</span>
-                    <button class="del-btn" onclick="deleteNote('${doc.id}')">Xóa</button>
-                `;
-                noteList.appendChild(li);
+                li.innerHTML = `<span>${note.text}</span><button class="del-btn" onclick="deleteNote('${doc.id}')">Xóa</button>`;
+                list.appendChild(li);
             });
         });
 
-        // Hàm Thêm ghi chú
         window.addNote = async function() {
             const input = document.getElementById('noteInput');
-            const text = input.value.trim();
-            if (!text) return;
-
-            try {
-                await addDoc(notesCol, {
-                    text: text,
-                    createdAt: serverTimestamp()
-                });
-                input.value = "";
-            } catch (e) {
-                alert("Lỗi kết nối Firebase: " + e.message);
-            }
+            if (!input.value.trim()) return;
+            await addDoc(notesCol, { text: input.value, createdAt: serverTimestamp() });
+            input.value = "";
         };
 
-        // Hàm Xóa ghi chú
         window.deleteNote = async function(id) {
             await deleteDoc(doc(db, "notes_cua_tan", id));
         };
+    </script>
 
-        // Nhấn Enter để thêm
-        document.getElementById('noteInput').addEventListener('keypress', (e) => {
-            if (e.key === 'Enter') addNote();
-        });
+    <script>
+        function initMap() {
+            // Mặc định ban đầu ở Đà Nẵng
+            let defaultPos = { lat: 16.0544, lng: 108.2022 };
+            
+            const map = new google.maps.Map(document.getElementById("map"), {
+                zoom: 15,
+                center: defaultPos,
+                styles: [
+                    {elementType: 'geometry', stylers: [{color: '#242f3e'}]},
+                    {elementType: 'labels.text.fill', stylers: [{color: '#746855'}]},
+                    {elementType: 'labels.text.stroke', stylers: [{color: '#242f3e'}]}
+                ]
+            });
 
-        // Xử lý Dark Mode
-        window.toggleTheme = function() {
-            document.body.classList.toggle('dark-mode');
-            const isDark = document.body.classList.contains('dark-mode');
-            localStorage.setItem('tan_theme', isDark);
-            document.getElementById('themeBtn').innerText = isDark ? "Chế độ tối: Bật" : "Chế độ tối: Tắt";
-        };
+            const marker = new google.maps.Marker({
+                position: defaultPos,
+                map: map,
+                title: "Vị trí của bạn",
+                animation: google.maps.Animation.DROP
+            });
 
-        // Khôi phục Dark Mode khi mở web
-        if (localStorage.getItem('tan_theme') === 'true') {
-            toggleTheme();
+            // Lấy vị trí thực tế của Tân
+            if (navigator.geolocation) {
+                navigator.geolocation.getCurrentPosition(
+                    (position) => {
+                        const currentPos = {
+                            lat: position.coords.latitude,
+                            lng: position.coords.longitude,
+                        };
+                        marker.setPosition(currentPos);
+                        map.setCenter(currentPos);
+                    },
+                    () => { console.log("Lỗi: Không lấy được vị trí."); }
+                );
+            }
         }
     </script>
+    <script async src="https://maps.googleapis.com/maps/api/js?key=AIzaSyCy4yXSLr85mw0RFcQHMpFy3fwcSqd5P3E&callback=initMap"></script>
+
 </body>
 </html>
