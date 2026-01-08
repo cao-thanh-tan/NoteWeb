@@ -10,7 +10,7 @@
             --bg: #f0f2f5; --card: #ffffff; --text: #1c1e21;
             --accent: #007bff; --note-bg: #fff9c4; --shadow: rgba(0,0,0,0.1);
         }
-        /* Chế độ tối chuyên nghiệp */
+        /* Dark Mode */
         .dark-mode {
             --bg: #18191a; --card: #242526; --text: #e4e6eb;
             --accent: #2e89ff; --note-bg: #3a3b3c; --shadow: rgba(0,0,0,0.3);
@@ -32,7 +32,7 @@
             height: 92vh;
         }
 
-        /* BẢN ĐỒ BÊN TRÁI (Nhỏ lại: flex 0.8) */
+        /* BẢN ĐỒ */
         #map {
             flex: 0.8; 
             border-radius: 15px;
@@ -40,7 +40,7 @@
             box-shadow: 0 4px 15px var(--shadow);
         }
 
-        /* GHI CHÚ BÊN PHẢI (To ra: flex 1.2) */
+        /* GHI CHÚ  */
         .container {
             flex: 1.2;
             background: var(--card);
@@ -50,6 +50,20 @@
             text-align: center;
             overflow-y: auto;
         }
+
+        /* STYLE CHO NÚT GPS */
+        .gps-button {
+            background-color: #fff;
+            border: none;
+            border-radius: 50%;
+            box-shadow: 0 2px 6px rgba(0,0,0,0.3);
+            cursor: pointer;
+            width: 45px; height: 45px;
+            margin: 10px;
+            display: flex; align-items: center; justify-content: center;
+            font-size: 20px; transition: 0.3s;
+        }
+        .gps-button:hover { background-color: #f0f0f0; transform: scale(1.1); }
 
         .avatar { width: 90px; height: 90px; border-radius: 50%; border: 3px solid var(--accent); object-fit: cover; margin-bottom: 15px; }
         h1 { font-size: 22px; margin: 0; text-transform: uppercase; }
@@ -66,13 +80,12 @@
             justify-content: space-between; align-items: center;
             border-left: 6px solid #f1c40f; font-weight: 500;
         }
-        .del-btn { background: #ff4757; color: white; border: none; padding: 6px 12px; border-radius: 5px; cursor: pointer; font-size: 12px; }
+        .del-btn { background: #ff4757; color: white; border: none; padding: 6px 12px; border-radius: 5px; cursor: pointer; }
 
-        /* Responsive cho điện thoại khi đi ship hàng */
         @media (max-width: 1000px) {
             .main-layout { flex-direction: column; height: auto; }
             #map { height: 350px; width: 100%; }
-            .container { max-width: 100%; width: 100%; box-sizing: border-box; }
+            .container { width: 100%; box-sizing: border-box; }
         }
     </style>
 </head>
@@ -87,7 +100,7 @@
             <div class="mssv">MSSV: 29211345079</div>
 
             <div class="input-group">
-                <input type="text" id="noteInput" placeholder="Nhập ghi chú:...">
+                <input type="text" id="noteInput" placeholder="Nhập ghi chú mới...">
                 <button id="addBtn" onclick="addNote()">Thêm</button>
             </div>
             <ul id="noteList"></ul>
@@ -130,19 +143,18 @@
             input.value = "";
         };
 
-        window.deleteNote = async function(id) {
-            await deleteDoc(doc(db, "notes_cua_tan", id));
-        };
+        window.deleteNote = async function(id) { await deleteDoc(doc(db, "notes_cua_tan", id)); };
     </script>
 
     <script>
         function initMap() {
-            // Mặc định ban đầu ở Đà Nẵng
-            let defaultPos = { lat: 16.0544, lng: 108.2022 };
+            let userPos = { lat: 16.0544, lng: 108.2022 }; // Đà Nẵng
             
             const map = new google.maps.Map(document.getElementById("map"), {
                 zoom: 15,
-                center: defaultPos,
+                center: userPos,
+                mapTypeControl: false,
+                fullscreenControl: false,
                 styles: [
                     {elementType: 'geometry', stylers: [{color: '#242f3e'}]},
                     {elementType: 'labels.text.fill', stylers: [{color: '#746855'}]},
@@ -151,25 +163,39 @@
             });
 
             const marker = new google.maps.Marker({
-                position: defaultPos,
+                position: userPos,
                 map: map,
                 title: "Vị trí của bạn",
                 animation: google.maps.Animation.DROP
             });
 
-            // Lấy vị trí thực tế của Tân
-            if (navigator.geolocation) {
-                navigator.geolocation.getCurrentPosition(
-                    (position) => {
-                        const currentPos = {
+            // TẠO NÚT GPS QUAY VỀ VỊ TRÍ
+            const locationButton = document.createElement("button");
+            locationButton.innerHTML = "🎯";
+            locationButton.classList.add("gps-button");
+            map.controls[google.maps.ControlPosition.RIGHT_BOTTOM].push(locationButton);
+
+            locationButton.addEventListener("click", () => {
+                if (navigator.geolocation) {
+                    navigator.geolocation.getCurrentPosition((position) => {
+                        const pos = {
                             lat: position.coords.latitude,
                             lng: position.coords.longitude,
                         };
-                        marker.setPosition(currentPos);
-                        map.setCenter(currentPos);
-                    },
-                    () => { console.log("Lỗi: Không lấy được vị trí."); }
-                );
+                        marker.setPosition(pos);
+                        map.setCenter(pos);
+                        map.setZoom(17);
+                    });
+                }
+            });
+
+            // Tự động lấy vị trí khi khởi động
+            if (navigator.geolocation) {
+                navigator.geolocation.getCurrentPosition((p) => {
+                    const currentPos = { lat: p.coords.latitude, lng: p.coords.longitude };
+                    marker.setPosition(currentPos);
+                    map.setCenter(currentPos);
+                });
             }
         }
     </script>
